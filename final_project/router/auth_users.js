@@ -4,6 +4,7 @@ let books = require("./booksdb.js");
 const regd_users = express.Router();
 regd_users.use(express.urlencoded());
 regd_users.use(express.json());
+const session = require('express-session')
 
 let users = require("./users.js");
 //[{"username":"admin1", "password": "admin1pass"},]
@@ -20,12 +21,17 @@ Object.keys(users).forEach(i=> {
 const authenticatedUser = (username,password)=>{ //returns boolean
 //write code to check if username and password match the one we have in records.
 console.log(users)
+let authenticated = false;
 Object.keys(users).forEach(i=> {
-    console.log(users.username);
+    console.log(users[i].username);
+    console.log(username)
+    console.log(password)
     if(users[i].username == username && users[i].password == password){
-        return true
+        console.log(true)
+        authenticated = true;
     }
 });
+return authenticated
 }
 
 //only registered users can login
@@ -44,15 +50,66 @@ regd_users.post("/login", (req,res) => {
       req.session.authorization = {
         accessToken
     }
+    req.session.username = user;
     return res.status(200).send("User successfully logged in");
 });
 
 // Add a book review
 regd_users.put("/auth/review/:isbn", (req, res) => {
   //Write your code here
-  return res.status(300).json({message: "Yet to be implemented"});
+  const isbn = req.params.isbn;
+  console.log(req.session.username);
+  const loggedinuser = req.session.username;
+  let book = books[isbn];
+  const newrev = {"user": loggedinuser, "review": req.body.review}
+ let bookreviews = []
+ bookreviews = books[isbn].reviews;
+ let addnewrev = true;
+ Object.keys(bookreviews).forEach(i =>{
+    if(bookreviews[i].user = loggedinuser){
+      bookreviews[i].review = req.body.review;
+      addnewrev = false;
+    }
+ });
+if(addnewrev){bookreviews.push(newrev);}
+ 
+ require('fs').writeFile('./router/booksdb.js',("let books =" + JSON.stringify(books) + "\n module.exports=books;"), (error) => {
+    if (error) {
+        throw error;
+    }
+});
+ return res.status(200).json({message: "Added the review"});
 });
 
+regd_users.delete("/auth/review/:isbn", (req, res) => {
+    const isbn = req.params.isbn;
+    
+    const loggedinuser = req.session.username;
+    let book = books[isbn];
+    let bookreviews = []
+    let message = "";
+   let deleted = false;
+   if(books[isbn].reviews != null){bookreviews = books[isbn].reviews;
+    Object.keys(bookreviews).forEach(i =>{
+        if(bookreviews[i].user = loggedinuser){
+          delete bookreviews[i]
+          deleted = true;
+          message = "deleted your review"
+        }
+     });
+}
+   
+   
+   
+  if(!deleted){message="You do not have any reviews for this book"}
+   
+   require('fs').writeFile('./router/booksdb.js',("let books =" + JSON.stringify(books) + "\n module.exports=books;"), (error) => {
+      if (error) {
+          throw error;
+      }
+  });
+  return res.status(200).json(message);
+});
 module.exports.authenticated = regd_users;
 module.exports.isValid = isValid;
 module.exports.users = users;
