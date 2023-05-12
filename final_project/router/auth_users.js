@@ -20,12 +20,10 @@ Object.keys(users).forEach(i=> {
 
 const authenticatedUser = (username,password)=>{ //returns boolean
 //write code to check if username and password match the one we have in records.
-console.log(users)
+
 let authenticated = false;
 Object.keys(users).forEach(i=> {
-    console.log(users[i].username);
-    console.log(username)
-    console.log(password)
+    
     if(users[i].username == username && users[i].password == password){
         console.log(true)
         authenticated = true;
@@ -39,7 +37,7 @@ regd_users.post("/login", (req,res) => {
   //Write your code here
   const user = req.body.username;
   const registereduser = isValid(req.body.username);
-  console.log(req.body.username)
+  
   const authenticateuser = authenticatedUser(req.body.username, req.body.password)
     if (!authenticateuser) {
         return res.status(404).json({message: "Body not Empty"});
@@ -58,7 +56,7 @@ regd_users.post("/login", (req,res) => {
 regd_users.put("/auth/review/:isbn", (req, res) => {
   //Write your code here
   const isbn = req.params.isbn;
-  console.log(req.session.username);
+  
   const loggedinuser = req.session.username;
   let book = books[isbn];
   const newrev = {"user": loggedinuser, "review": req.body.review}
