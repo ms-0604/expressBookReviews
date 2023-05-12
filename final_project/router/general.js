@@ -10,18 +10,18 @@ public_users.use(express.json());
 
 public_users.post("/register", (req,res) => {
   //Write your code here
-  console.log(users);
+  
   const username = req.body.username;
   const password = req.body.password;
   const user = {"username": username, "password": password };
-  console.log(user);
+  
   let message = "";
   if(username == "" || password == ""){
       message = "Please provide credentials";
   }
   var exist = false;
   Object.keys(users).forEach((i)=> {
-          console.log("checking");
+          
   if(users[i].username == username){
       
       exist= true;
@@ -34,7 +34,7 @@ if(exist){
 if(!exist) {
     users.push(user);
     //req.session.users = users;
-    console.log("added");
+    
     
     
     require('fs').writeFile('./router/users.js',("let books =" + JSON.stringify(users) + "\n module.exports=books;"), (error) => {
@@ -108,10 +108,10 @@ public_users.get('/title/:title',function (req, res) {
   const mybooks = [];
   let myPromise = new Promise((resolve,reject) =>{
   Object.keys(books).forEach(i => {
-    console.log(books[i].title)
+    
       if(books[i].title === titlename)
     {
-        console.log(books[i].title);
+        
         mybooks.push(books[i]);
     } 
     resolve(mybooks) 
