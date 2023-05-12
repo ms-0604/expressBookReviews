@@ -5,6 +5,8 @@ let users = require("./auth_users.js").users;
 const public_users = express.Router();
 public_users.use(express.urlencoded());
 public_users.use(express.json());
+const axios = require('axios').default;
+let prompt = require('prompt-sync')();
 
 
 
@@ -131,5 +133,89 @@ public_users.get('/review/:isbn',function (req, res) {
   const rev= books[isbn].Review;
   return res.status(200).json(rev);
 });
+
+
+const axios = require('axios').default;
+const connectToURL = async(url)=>{
+    const outcome = books;
+    let listOfbooks = (await outcome).data.books;
+    listOfbooks.forEach((book)=>{
+      console.log(book);
+    });
+}
+
+
+//getBooksList ("https://github.com/ms-0604/expressBookReviews/blob/main/final_project/router/booksdb.js")
+
+const BookPromise = new Promise((resolve,reject)=>{
+    let isbn = prompt('What is the isbn number ?');
+    try {
+        
+      const mybook = books[isbn];
+        resolve(mybook);
+    } catch(err) {
+      reject(err)
+    }
+});
+
+console.log(BookPromise);
+
+BookPromise.then(
+  (mybook) => console.log(mybook),
+  (err) => console.log("Error reading data") 
+);
+
+const BookPromiseAuthor = new Promise((resolve,reject)=>{
+    let author = prompt('What is the author name ?');
+    try {
+        
+        const mybooks = [];
+        Object.keys(books).forEach(i => {
+    
+            if(books[i].author === author)
+          {
+              mybooks.push(books[i]);
+          }     
+       
+          })
+        resolve(mybooks);
+    } catch(err) {
+      reject(err)
+    }
+});
+
+console.log(BookPromiseAuthor);
+
+BookPromiseAuthor.then(
+  (mybook) => console.log(mybook),
+  (err) => console.log("Error reading data") 
+);
+
+
+const BookPromiseTitle = new Promise((resolve,reject)=>{
+    let title = prompt('What is the title name ?');
+    try {
+        const mybooks = [];
+        Object.keys(books).forEach(i => {
+    
+            if(books[i].title === title)
+          {
+              mybooks.push(books[i]);
+          }     
+       
+          })
+        resolve(mybooks);
+    } catch(err) {
+      reject(err)
+    }
+});
+
+console.log(BookPromiseTitle);
+
+BookPromiseTitle.then(
+  (mybook) => console.log(mybook),
+  (err) => console.log("Error reading data") 
+);
+
 
 module.exports.general = public_users;
